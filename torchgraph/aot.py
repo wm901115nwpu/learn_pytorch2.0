@@ -22,7 +22,7 @@ if __name__ == '__main__':
         nn.Conv2d(16, 32, 3),
         nn.BatchNorm2d(32),
         nn.SiLU(),
-    ).cuda()
-    x = torch.randn((2, 16, 8, 8), requires_grad=True, device="cuda")
+    )
+    x = torch.randn((2, 16, 8, 8), requires_grad=True, device="cpu")
 
     capture(model, x)
