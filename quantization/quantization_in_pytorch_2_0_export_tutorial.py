@@ -33,7 +33,7 @@ import torch
 import copy
 import torch._dynamo as torchdynamo
 from torch.ao.quantization.quantize_pt2e import convert_pt2e, prepare_pt2e
-import torch.ao.quantization.pt2e.quantizer.xnnpack_quantizer as xq
+import torch.ao.quantization.quantizer.xnnpack_quantizer as xq
 
 class M(torch.nn.Module):
     def __init__(self):
