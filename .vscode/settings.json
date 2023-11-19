@@ -1,4 +1,9 @@
 {
     "editor.suggest.snippetsPreventQuickSuggestions": false,
-    "svg.preview.background": "editor"
+    "svg.preview.background": "editor",
+    "files.associations": {
+        "*.excalidraw": "json",
+        "*.excalidrawlib": "json",
+        "dense": "cpp"
+    }
 }
