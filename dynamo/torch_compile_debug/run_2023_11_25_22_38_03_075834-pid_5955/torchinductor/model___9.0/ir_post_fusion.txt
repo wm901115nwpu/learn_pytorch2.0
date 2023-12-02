@@ -1,0 +1,67 @@
+buf0: SchedulerNode(ComputedBuffer)
+buf0.writes = [MemoryDep('buf0', c0, {c0: 10})]
+buf0.unmet_dependencies = []
+buf0.met_dependencies = [MemoryDep('arg0_1', c0, {c0: 10})]
+buf0.users = [NodeUser(node=OUTPUT, can_inplace=False, is_weak=False)]
+buf0.group.device = cpu
+buf0.group.iteration = ((10,), ())
+buf0.sizes = ([10], [])
+class buf0_loop_body:
+    var_ranges = {z0: 10}
+    index0 = z0
+    def body(self, ops):
+        get_index = self.get_index('index0')
+        load = ops.load('arg0_1', get_index)
+        get_index_1 = self.get_index('index0')
+        load_1 = ops.load('arg0_1', get_index_1)
+        abs_1 = ops.abs(load_1)
+        constant = ops.constant(1.0, torch.float32)
+        add = ops.add(abs_1, constant)
+        truediv = ops.truediv(load, add)
+        get_index_2 = self.get_index('index0')
+        store = ops.store('buf0', get_index_2, truediv, None)
+        return store
+
+
+buf1: SchedulerNode(ComputedBuffer)
+buf1.writes = [MemoryDep('buf1', 0, {})]
+buf1.unmet_dependencies = []
+buf1.met_dependencies = [MemoryDep('arg1_1', c0, {c0: 10})]
+buf1.users = [NodeUser(node=SchedulerNode(name='buf2'), can_inplace=True, is_weak=False)]
+buf1.group.device = cpu
+buf1.group.iteration = ((), (10,))
+buf1.sizes = ([], [10])
+class buf1_loop_body:
+    var_ranges = {z0: 10}
+    index0 = z0
+    index1 = 0
+    def body(self, ops):
+        get_index = self.get_index('index0')
+        load = ops.load('arg1_1', get_index)
+        reduction = ops.reduction(torch.float32, torch.float32, 'sum', load)
+        get_index_1 = self.get_index('index1')
+        store_reduction = ops.store_reduction('buf1', get_index_1, reduction)
+        return store_reduction
+
+
+buf2: SchedulerNode(ComputedBuffer)
+buf2.writes = [MemoryDep('buf2', 0, {})]
+buf2.unmet_dependencies = [MemoryDep('buf1', 0, {})]
+buf2.met_dependencies = []
+buf2.users = [NodeUser(node=OUTPUT, can_inplace=False, is_weak=False)]
+buf2.group.device = cpu
+buf2.group.iteration = ((), ())
+buf2.sizes = ([], [])
+class buf2_loop_body:
+    var_ranges = {}
+    index0 = 0
+    def body(self, ops):
+        get_index = self.get_index('index0')
+        load = ops.load('buf1', get_index)
+        constant = ops.constant(0.0, torch.float32)
+        lt = ops.lt(load, constant)
+        get_index_1 = self.get_index('index0')
+        store = ops.store('buf2', get_index_1, lt, None)
+        return store
+
+

@@ -1,7 +1,7 @@
 from typing import List
 import torch
 
-def my_compiler(gm: torch.fx.GraphModule, example_inputs: List[torch.Tensor]):
+def my_compiler(gm: torch.fx.GraphModule, example_inputs: List[torch.Tensor], mode: str):
     print(">>> my_compiler() invoked:")
     print(">>> FX graph:")
     gm.graph.print_tabular()
@@ -13,12 +13,12 @@ def toy_example(a, b):
     if b.sum() < 0:
         b = b * -1
     return x * b
-
+@torch.compile(backend=my_compiler, mode='max-autotune')
 def test(a, b):
     for i in range(4):
         toy_example(a, b * (-1) ** i)
 
 if __name__ == "__main__":
     a, b = torch.randn(10), torch.ones(10)
-    toy_example = torch.compile(toy_example, backend=my_compiler)
+    # toy_example = torch.compile(toy_example, backend=my_compiler, mode='max-autotune-no-cudagraphs')
     test(a, b)
