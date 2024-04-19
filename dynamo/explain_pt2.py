@@ -1,41 +1,44 @@
-'''
-Explain torch.compile in source code
-'''
-import torch
-@torch.compile(backend="eager")
-def toy_example(a, b):
-    x = a / (torch.abs(a) + 1)
-    if b.sum() < 0:
-        b = b * -1
-    return x * b
-
-for _ in range(100):
-    toy_example(torch.randn(10), torch.randn(10))
-
-
-from depyf.explain import dump_src
-src = dump_src(toy_example)
-with open("explained_code.py", "w") as f:
-     f.write(src)
-
-'''
-Enhance torch.compile logging
-'''
-import depyf
-depyf.install()
-from typing import List
 import torch
 from torch import _dynamo as torchdynamo
-def my_compiler(gm: torch.fx.GraphModule, example_inputs: List[torch.Tensor]):
-    print("my_compiler() called with FX graph:")
-    gm.graph.print_tabular()
-    return gm.forward  # return a python callable
+from typing import List
 
-@torchdynamo.optimize(my_compiler)
+@torch.compile
 def toy_example(a, b):
     x = a / (torch.abs(a) + 1)
     if b.sum() < 0:
         b = b * -1
     return x * b
-for _ in range(100):
-    toy_example(torch.randn(10), torch.randn(10))
+
+def main():
+    for _ in range(100):
+        toy_example(torch.randn(10), torch.randn(10))
+
+if __name__ == "__main__":
+    # main()
+    # surround the code you want to run inside `with depyf.prepare_debug`
+    import depyf
+    with depyf.prepare_debug("./dump_src_dir"):
+        main()
+
+import torch
+from torch import _dynamo as torchdynamo
+from typing import List
+
+@torch.compile
+def toy_example(a, b):
+    x = a / (torch.abs(a) + 1)
+    if b.sum() < 0:
+        b = b * -1
+    return x * b
+
+def main():
+    for _ in range(100):
+        toy_example(torch.randn(10), torch.randn(10))
+
+if __name__ == "__main__":
+    import depyf
+    with depyf.prepare_debug("./dump_src_dir"):
+        main()
+    # surround the code you want to debug inside `with depyf.debug()`
+    with depyf.debug():
+        main()
